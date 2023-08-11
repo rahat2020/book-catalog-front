@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import Topbar from "../../components/Topbar"
 import { useDeleteBookMutation, useGetSinglePostQuery, usePostCommentMutation, useUpdateBookDataMutation } from "../../redux/api/apiSlice"
 import Card from 'react-bootstrap/Card';
@@ -42,55 +42,74 @@ export const SingleBook = () => {
 
     // updating the book data
     const [show, setShow] = useState(false);
-    const [UpdateBook] = useUpdateBookDataMutation()
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    
+    const [UpdateBook] = useUpdateBookDataMutation()
+    const [title, setTitle] = useState(item?.title || '')
+    const [genre, setGenres] = useState(item?.genre || '')
+    const [author, setAuthor] = useState(item?.author || '')
+    const [publicationDate, setpublicationDate] = useState(item?.publicationDate || '')
+    const [published, setpublished] = useState(item?.published || '')
+    const [file, setfile] = useState(item?.photo || '')
 
-    const [title, setTitle] = useState('')
-    const [genre, setGenres] = useState('')
-    const [author, setAuthor] = useState('')
-    const [publicationDate, setpublicationDate] = useState('')
-    const [published, setpublished] = useState('')
-    const [file, setfile] = useState('')
-
+    console.log(file === '')
     const handleUpdateSubmit = async (event: any) => {
         event.preventDefault();
-        const data = new FormData();
-        data.append("file", file);
-        data.append("upload_preset", "upload");
-        const uploadRes = await axios.post("https://api.cloudinary.com/v1_1/rahatdev1020/image/upload", data)
-        const { url } = uploadRes.data
-
-        const options = {
-            id:_id,
-            title: title || item.title,
-            genre:genre || item.genre,
-            author:author || item.author,
-            publicationDate: publicationDate || item.publicationDate,
-            published: published || item.published,
-            photo: url || item?.photo
-        };
-        console.log('options', options)
-        try {
-            const response = await UpdateBook(options)
-            console.log('Book added:', response);
-            if (response.data === "book is updated") {
-                toast("Book is updated")
+        if (file === '') {
+            const data = {
+                id:_id,
+                title: title || item?.title || '',
+                genre: genre || item?.genre || '',
+                author: author || item?.author || '',
+                publicationDate: publicationDate || item?.publicationDate || '',
+                published: published || item?.published || '',
+                photo: item?.photo || '',
+            };
+            console.log('data', data)
+            try {
+                const response = await UpdateBook(data)
+                console.log('Book updated:', response);
+                if (response.data === "book is updated") {
+                    toast("Book is updated")
+                }
+            } catch (error) {
+                console.error('Error updating book:', error);
             }
-            setTitle('')
-            setGenres('')
-            setAuthor('')
-            setpublicationDate('')
-            setpublished('')
-            setfile('')
-        } catch (error) {
-            console.error('Error updating book:', error);
-            // Handle error, display a message, etc.
+        } else if (file){
+            const data = new FormData();
+            data.append("file", file);
+            data.append("upload_preset", "upload");
+            const uploadRes = await axios.post("https://api.cloudinary.com/v1_1/rahatdev1020/image/upload", data)
+            const { url } = uploadRes.data
+
+            const options = {
+                id:_id,
+                title: title || item?.title || '',
+                genre: genre || item?.genre || '',
+                author: author || item?.author || '',
+                publicationDate: publicationDate || item?.publicationDate || '',
+                published: published || item?.published || '',
+                photo: url || item?.photo || '',
+            };
+            console.log('options', options)
+            try {
+                const response = await UpdateBook(options)
+                console.log('Book added:', response);
+                if (response.data === "book is updated") {
+                    toast("Book is updated")
+                }
+            } catch (error) {
+                console.error('Error updating book:', error);
+            }
         }
+
+
     };
 
     // delete book data
     const [DeleteBook] = useDeleteBookMutation()
+    const navigate = useNavigate()
 
     const handleDeleteBook = (_id: any) => {
         // console.log(_id)
@@ -104,21 +123,20 @@ export const SingleBook = () => {
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                const options = {
-                    id: _id
-                };
-                console.log("id", _id)
                 try {
-                    const response = DeleteBook(options)
-                    console.log('response', response)
+                    const response = DeleteBook(_id)
+                    // const response = DeleteBook(options)
+                    Swal.fire(
+                        'Deleted!',
+                        'Your book has been deleted.',
+                        'success'
+                    )
+                    navigate('/all-books')
+
                 } catch (error) {
                     console.error('Error deleting book:', error);
                 }
-                Swal.fire(
-                    'Deleted!',
-                    'Your book has been deleted.',
-                    'success'
-                )
+
             }
         })
     }
@@ -148,7 +166,7 @@ export const SingleBook = () => {
                             </Col>
                             <Col md={6}>
                                 <div className="d-flex justify-content-end ">
-                                    <img src={item?.photo} alt="book-image" className="shadow-sm rounded" style={{ width: '200px', height: '150px', objectFit: 'cover' }} />
+                                    <img src={item?.photo} alt="book-image" className="shadow-sm rounded" style={{ width: '200px', height: '150px', objectFit: 'cover' }} loading="lazy"/>
                                 </div>
                             </Col>
                         </Row>
@@ -167,8 +185,8 @@ export const SingleBook = () => {
                                     <Col md={6}>
                                         <Form.Group className="mb-3" controlId="formBasicEmail">
                                             <Form.Label>Title</Form.Label>
-                                            <Form.Control type="text" placeholder="Enter book title" defaultValue={item?.title} 
-                                            onChange={(e) => setTitle(e.target.value)} />
+                                            <Form.Control type="text" placeholder="Enter book title" defaultValue={item?.title}
+                                                onChange={(e) => setTitle(e.target.value)} />
                                         </Form.Group>
                                     </Col>
                                     <Col md={6}>

@@ -1,5 +1,7 @@
 import Table from 'react-bootstrap/Table';
 import { useGetAllPostQuery } from '../redux/api/apiSlice';
+import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 const Books = () => {
     const { data } = useGetAllPostQuery(undefined)
     return (
@@ -19,27 +21,32 @@ const Books = () => {
                         </tr>
                     </thead>
                     {
-                        data?.map((item:{
+                        data?.map((item: {
                             _id: number;
                             title: string;
                             photo: string;
                             author: string;
                             genre: string;
-                            published:boolean;
+                            published: boolean;
                             publicationDate: string;
                         }, index: number) => (
                             <tbody key={index}>
                                 <tr>
-                                    <td>{index+1}</td>
+                                    <td>{index + 1}</td>
                                     <td>{item.title}</td>
                                     <td>{item.genre}</td>
                                     <td>{item.author}</td>
                                     <td>
-                                        <img src={item.photo} alt="book-images" 
-                                        style={{width: '40px', height: '40px', borderRadius: '50%', objectFit:'cover'}}/>
+                                        <img src={item.photo} alt="book-images"
+                                            style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
                                     </td>
                                     <td>{item.publicationDate}</td>
-                                    <td>{item.published === true ? "Yes":"No"}</td>
+                                    <td>{item.published === true ? "Yes" : "No"}</td>
+                                    <td>
+                                        <Link to={`/book/single/${item._id}`} className='text-decoration-none'>
+                                            <Button>View</Button>
+                                        </Link>
+                                    </td>
                                 </tr>
                             </tbody>
                         ))
