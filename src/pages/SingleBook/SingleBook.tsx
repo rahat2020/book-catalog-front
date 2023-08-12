@@ -6,23 +6,35 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import { Footer } from "../../components/Footer";
 import Form from 'react-bootstrap/Form';
 import { Button, Col, Row } from "react-bootstrap";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import Swal from "sweetalert2";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setLoading, setStateUser } from "../../redux/user/userSlice";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/firease";
 
 export const SingleBook = () => {
     const { _id } = useParams()
     // console.log('id', _id)
     const { data: item } = useGetSinglePostQuery(_id)
-    // console.log(item)
-
-
-
     const { user } = useAppSelector((state) => state.user)
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+      dispatch(setLoading(true))
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          dispatch(setStateUser(user.email))
+          dispatch(setLoading(false))
+        } else {
+          dispatch(setLoading(false))
+        }
+      });
+    }, [dispatch])
 
     const [AddComment] = usePostCommentMutation()
     const [comment, setComment] = useState('')

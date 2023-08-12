@@ -3,16 +3,32 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Footer } from "../../components/Footer";
 import { Col, Row } from "react-bootstrap";
-import {  useState } from "react";
+import { useState, useEffect } from "react";
 import { useAddNewBookMutation } from "../../redux/api/apiSlice";
 import { useAppDispatch } from "../../redux/hooks";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { setLoading, setStateUser } from "../../redux/user/userSlice";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/firease";
 
 const AddNew = () => {
 
     const [AddBook] = useAddNewBookMutation()
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        dispatch(setLoading(true))
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                dispatch(setStateUser(user.email))
+                dispatch(setLoading(false))
+            } else {
+                dispatch(setLoading(false))
+            }
+        });
+    }, [dispatch])
 
 
     const [title, setTitle] = useState('')
@@ -36,7 +52,7 @@ const AddNew = () => {
             author,
             publicationDate,
             published,
-            photo:url
+            photo: url
         };
         console.log('options', options)
         try {
@@ -111,7 +127,7 @@ const AddNew = () => {
                             <Col md={6}>
                                 <Form.Group className="mb-3" controlId="formBasicEmail">
                                     <Form.Label>Book Image</Form.Label>
-                                    <Form.Control type="file" onChange={(e:any) => setfile(e.target.files[0])}/>
+                                    <Form.Control type="file" onChange={(e: any) => setfile(e.target.files[0])} />
                                 </Form.Group>
                             </Col>
                         </Row>

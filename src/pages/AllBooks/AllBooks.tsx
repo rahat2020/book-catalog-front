@@ -2,8 +2,12 @@ import { Footer } from "../../components/Footer";
 import Topbar from "../../components/Topbar"
 import { Row, Col, Card, Form, Button } from 'react-bootstrap';
 import { useFillteredBookDataQuery, useGetAllPostQuery,  } from "../../redux/api/apiSlice";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAppDispatch } from "../../redux/hooks";
+import { setLoading, setStateUser } from "../../redux/user/userSlice";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../firebase/firease";
 
 // const Pddata = [
 //   {
@@ -43,15 +47,27 @@ import { Link } from "react-router-dom";
 const AllBooks = () => {
 
   const { data } = useGetAllPostQuery(undefined)
+  const dispatch = useAppDispatch()
 
-
+  useEffect(() => {
+    dispatch(setLoading(true))
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        dispatch(setStateUser(user.email))
+        dispatch(setLoading(false))
+      } else {
+        dispatch(setLoading(false))
+      }
+    });
+  }, [dispatch])
 
 
   const [searchQuery, setSearchQuery] = useState('');
   const filteredData = data?.filter((item: { title: string, author: string, genre: string }) =>
-    item?.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item?.author.toLowerCase().includes(searchQuery.toLowerCase())
+    item?.title.toLowerCase().includes(searchQuery.toLowerCase()) 
+    // item?.genre.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    // item?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    // item?.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
 
