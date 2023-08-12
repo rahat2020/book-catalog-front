@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Topbar from "../../components/Topbar"
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -38,6 +39,7 @@ const AddNew = () => {
     const [published, setpublished] = useState('')
     const [file, setfile] = useState('')
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         const data = new FormData();
@@ -59,9 +61,10 @@ const AddNew = () => {
             const response = await AddBook(options)
             //   const response = await dispatch(AddBook(options)).unwrap();
             console.log('Book added:', response);
-            if (response.data === "book created") {
-                toast("Book is created")
-            }
+            toast("Book is created")
+            // if (response.data === "book created") {
+            //     toast("Book is created")
+            // }
             setTitle('')
             setGenres('')
             setAuthor('')

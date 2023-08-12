@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate, useParams } from "react-router-dom"
 import Topbar from "../../components/Topbar"
 import { useDeleteBookMutation, useGetSinglePostQuery, usePostCommentMutation, useUpdateBookDataMutation } from "../../redux/api/apiSlice"
@@ -46,11 +47,12 @@ export const SingleBook = () => {
             data: { comment: comment }
         };
         try {
-            const response = await AddComment(options)
+             await AddComment(options)
             setComment('')
-            if (response.data === "review created") {
-                toast("Review is created")
-            }
+            toast("Review is created")
+            // if (response.data === "review created") {
+            //     toast("Review is created")
+            // }
         } catch (error) {
             console.error('Error adding review:', error);
         }
@@ -87,9 +89,10 @@ export const SingleBook = () => {
             try {
                 const response = await UpdateBook(data)
                 console.log('Book updated:', response);
-                if (response.data === "book is updated") {
-                    toast("Book is updated")
-                }
+                toast("Book is updated")
+                // if (response.data === "book is updated") {
+                //     toast("Book is updated")
+                // }
             } catch (error) {
                 console.error('Error updating book:', error);
             }
@@ -111,11 +114,11 @@ export const SingleBook = () => {
             };
             console.log('options', options)
             try {
-                const response = await UpdateBook(options)
-                console.log('Book added:', response);
-                if (response.data === "book is updated") {
-                    toast("Book is updated")
-                }
+                await UpdateBook(options)
+                toast("Book is updated")
+                // if (response?.data === "book is updated") {
+                //     toast("Book is updated")
+                // }
             } catch (error) {
                 console.error('Error updating book:', error);
             }
@@ -141,7 +144,7 @@ export const SingleBook = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = DeleteBook(_id)
+                   DeleteBook(_id)
                     // const response = DeleteBook(options)
                     Swal.fire(
                         'Deleted!',
