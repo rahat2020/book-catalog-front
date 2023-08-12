@@ -1,7 +1,7 @@
 import { Footer } from "../../components/Footer";
 import Topbar from "../../components/Topbar"
 import { Row, Col, Card, Form, Button } from 'react-bootstrap';
-import { useGetAllPostQuery, useGetSinglePostQuery } from "../../redux/api/apiSlice";
+import { useFillteredBookDataQuery, useGetAllPostQuery,  } from "../../redux/api/apiSlice";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -46,7 +46,6 @@ const AllBooks = () => {
 
 
 
-  console.log(data)
 
   const [searchQuery, setSearchQuery] = useState('');
   const filteredData = data?.filter((item: { title: string, author: string, genre: string }) =>
@@ -55,14 +54,13 @@ const AllBooks = () => {
     item?.author.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  console.log(filteredData)
 
   const [filteredBook, setFiltered] = useState('')
+  console.log('filteredBook', filteredBook)
+  const { data: item } = useFillteredBookDataQuery(filteredBook)
+  console.log('item', item?.length !== 0)
+  console.log('item', item)
 
-  const handleSubmit = () => {
-    console.log('submitted')
-  }
-  
   return (
     <div>
       <Topbar />
@@ -83,14 +81,14 @@ const AllBooks = () => {
               </Form>
             </div>
           </div>
-
         </div>
       </div>
       <div className="container mt-5 pt-5 mb-5">
         <div className="d-flex justify-content-end align-items-center">
           <div className="w-100 d-flex justify-content-between align-items-center">
-            <Form.Select aria-label="Default select example" className="w-25" onChange={(e)=>setFiltered(e.target.value)}>
+            <Form.Select aria-label="Default select example" className="w-25" onChange={(e) => setFiltered(e.target.value)}>
               <option>Open this to select genre</option>
+              <option value="All">All</option>
               <option value="Horror">Horror</option>
               <option value="Romantic">Romantic</option>
               <option value="Action">Action</option>
@@ -98,39 +96,77 @@ const AllBooks = () => {
               <option value="Science Fiction">Science Fiction</option>
               <option value="Novel">Novel</option>
             </Form.Select>
-            <Button variant="outline-success fw-bold" onClick={handleSubmit}>Filter</Button>
+            {/* <Button variant="outline-success fw-bold" onClick={handleSubmit}>Filter</Button> */}
           </div>
         </div>
         <Row className="">
           {
-            filteredData?.map((item: {
-              _id: number;
-              title: string;
-              photo: string;
-              author: string;
-              genre: string;
-              published: boolean;
-              publicationDate: string;
-            }, index: number) => (
-              <Col md={4} key={index} className="my-3">
-                <Link to={`/book/single/${item._id}`} className="text-decoration-none">
-                  <Card style={{ height: '27.75rem' }} className="border-0 shadow-sm rounded">
-                    <div className="d-flex">
-                      <Card.Img variant="top" src={item.photo} style={{ height: '18.75rem', objectFit: 'contain' }} />
-                    </div>
-                    <Card.Body>
-                      <Card.Title className="fw-bold text-muted">{item.title}</Card.Title>
-                      <Card.Title className="text-muted">Author: {item.author}</Card.Title>
-                      <div className="d-flex justify-content-between">
-                        <Card.Text className="fw-bold text-secondary">Genre: {item.genre}</Card.Text>
-                        <Card.Text className="fw-bold text-secondary">Published: {item.publicationDate.slice(0, 10)}</Card.Text>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </Link>
-              </Col>
-            ))
+            item?.length !== 0 ?
+              <>
+                {
+                  item?.map((item: {
+                    _id: number;
+                    title: string;
+                    photo: string;
+                    author: string;
+                    genre: string;
+                    published: boolean;
+                    publicationDate: string;
+                  }, index: number) => (
+                    <Col md={4} key={index} className="my-3">
+                      <Link to={`/book/single/${item._id}`} className="text-decoration-none">
+                        <Card style={{ height: '27.75rem' }} className="border-0 shadow-sm rounded">
+                          <div className="d-flex">
+                            <Card.Img variant="top" src={item.photo} style={{ height: '18.75rem', objectFit: 'contain' }} />
+                          </div>
+                          <Card.Body>
+                            <Card.Title className="fw-bold text-muted">{item.title}</Card.Title>
+                            <Card.Title className="text-muted">Author: {item.author}</Card.Title>
+                            <div className="d-flex justify-content-between">
+                              <Card.Text className="fw-bold text-secondary">Genre: {item.genre}</Card.Text>
+                              <Card.Text className="fw-bold text-secondary">Published: {item.publicationDate.slice(0, 10)}</Card.Text>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Link>
+                    </Col>
+                  ))
+                }
+              </>
+              :
+              <>
+                {
+                  filteredData?.map((item: {
+                    _id: number;
+                    title: string;
+                    photo: string;
+                    author: string;
+                    genre: string;
+                    published: boolean;
+                    publicationDate: string;
+                  }, index: number) => (
+                    <Col md={4} key={index} className="my-3">
+                      <Link to={`/book/single/${item._id}`} className="text-decoration-none">
+                        <Card style={{ height: '27.75rem' }} className="border-0 shadow-sm rounded">
+                          <div className="d-flex">
+                            <Card.Img variant="top" src={item.photo} style={{ height: '18.75rem', objectFit: 'contain' }} />
+                          </div>
+                          <Card.Body>
+                            <Card.Title className="fw-bold text-muted">{item.title}</Card.Title>
+                            <Card.Title className="text-muted">Author: {item.author}</Card.Title>
+                            <div className="d-flex justify-content-between">
+                              <Card.Text className="fw-bold text-secondary">Genre: {item.genre}</Card.Text>
+                              <Card.Text className="fw-bold text-secondary">Published: {item.publicationDate.slice(0, 10)}</Card.Text>
+                            </div>
+                          </Card.Body>
+                        </Card>
+                      </Link>
+                    </Col>
+                  ))
+                }
+              </>
           }
+
         </Row>
       </div>
       <Footer />

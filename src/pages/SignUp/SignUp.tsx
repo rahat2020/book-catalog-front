@@ -1,8 +1,25 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import Topbar from '../../components/Topbar';
 import { Link } from 'react-router-dom';
+import { useAppDispatch } from '../../redux/hooks';
+import { useState } from 'react'
+import { createUser } from '../../redux/user/userSlice';
 
 const SignUp = () => {
+
+  const dispatch = useAppDispatch()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleSubmit = (e:any) => {
+    e.preventDefault()
+    const options = {
+      email: email,
+      password: password
+    }
+    console.log('options', options)
+    dispatch(createUser(options))
+  }
 
   return (
     <>
@@ -18,18 +35,19 @@ const SignUp = () => {
             <div className="d-flex justify-content-center align-items-center container" style={{ width: '100%', height: '100vh' }}>
               <Form >
                 <h4 className="text-center text-dark">welcome! Sign up</h4>
-                <Form.Group controlId="formBasicEmail">
+                {/* <Form.Group controlId="formBasicEmail">
                   <Form.Control
-                    type="email"
+                    type="text"
                     placeholder="Enter username"
                     className='shadow-sm border-0'
                   />
-                </Form.Group>
+                </Form.Group> */}
                 <Form.Group controlId="formBasicEmail">
                   <Form.Control
                     type="email"
                     placeholder="Enter email"
                     className='shadow-sm border-0 mt-3'
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group controlId="formBasicPassword">
@@ -37,6 +55,7 @@ const SignUp = () => {
                     type="password"
                     placeholder="Password"
                     className='shadow-sm border-0 mt-3 mb-2'
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group controlId="formForgotPass">
@@ -45,7 +64,7 @@ const SignUp = () => {
                   </Link>
                 </Form.Group>
 
-                <Button variant="outline-secondary" type="submit" className='mt-3'>
+                <Button variant="outline-secondary" type="submit" className='mt-3' onClick={handleSubmit}>
                   Sign up
                 </Button>
               </Form>

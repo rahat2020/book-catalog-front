@@ -15,21 +15,25 @@ export const api = createApi({
       query: (id) => `/get/${id}`,
       providesTags: ['Books']
     }),
+    FillteredBookData: builder.query({
+      query: (data) => `/filtered?genre=${data}`,
+      providesTags: ['Books']
+    }),
     postComment: builder.mutation({
       query: ({ data, id }) => ({
         url: `/reviews/${id}`,
         method: 'POST',
         body: data,
-        invalidatesTags: ['Books']
       }),
+      invalidatesTags: ['Books']
     }),
     addNewBook: builder.mutation({
       query: (data) => ({
         url: '/add',
         method: 'POST',
         body: data,
-        invalidatesTags: ['Books']
       }),
+      invalidatesTags: ['Books']
     }),
     updateBookData: builder.mutation({
       query: (data) => {
@@ -40,25 +44,18 @@ export const api = createApi({
           url: `/update/${id}`,
           method: 'PUT',
           body,
-          invalidatesTags: ['Books']
         }
       },
+      invalidatesTags: ['Books']
     }),
-    // updateBookData: builder.mutation({
-    //   query: ({ id, ...data }) => ({
-    //     url: `/update/${id}`,
-    //     method: 'PUT',
-    //     body: data,
-    //     invalidatesTags:['Books']
-    //   }),
-    // }),
+ 
     deleteBook: builder.mutation({
       query: (id) => ({
         url: `/delete/${id}`,
         method: 'DELETE',
         body: id,
-        invalidatesTags: ['Books']
       }),
+      invalidatesTags: ['Books']
     }),
 
 
@@ -71,4 +68,6 @@ export const {
   useAddNewBookMutation,
   usePostCommentMutation,
   useUpdateBookDataMutation,
-  useDeleteBookMutation } = api
+  useDeleteBookMutation,
+  useFillteredBookDataQuery,
+} = api

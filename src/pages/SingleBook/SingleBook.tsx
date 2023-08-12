@@ -12,12 +12,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import Modal from 'react-bootstrap/Modal';
 import axios from 'axios';
 import Swal from "sweetalert2";
+import { useAppSelector } from "../../redux/hooks";
 
 export const SingleBook = () => {
     const { _id } = useParams()
     // console.log('id', _id)
     const { data: item } = useGetSinglePostQuery(_id)
     // console.log(item)
+
+
+
+    const { user } = useAppSelector((state) => state.user)
 
     const [AddComment] = usePostCommentMutation()
     const [comment, setComment] = useState('')
@@ -44,7 +49,7 @@ export const SingleBook = () => {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    
+
     const [UpdateBook] = useUpdateBookDataMutation()
     const [title, setTitle] = useState(item?.title || '')
     const [genre, setGenres] = useState(item?.genre || '')
@@ -58,7 +63,7 @@ export const SingleBook = () => {
         event.preventDefault();
         if (file === '') {
             const data = {
-                id:_id,
+                id: _id,
                 title: title || item?.title || '',
                 genre: genre || item?.genre || '',
                 author: author || item?.author || '',
@@ -76,7 +81,7 @@ export const SingleBook = () => {
             } catch (error) {
                 console.error('Error updating book:', error);
             }
-        } else if (file){
+        } else if (file) {
             const data = new FormData();
             data.append("file", file);
             data.append("upload_preset", "upload");
@@ -84,7 +89,7 @@ export const SingleBook = () => {
             const { url } = uploadRes.data
 
             const options = {
-                id:_id,
+                id: _id,
                 title: title || item?.title || '',
                 genre: genre || item?.genre || '',
                 author: author || item?.author || '',
@@ -148,10 +153,13 @@ export const SingleBook = () => {
             <Topbar />
             <div className="container mt-5 pt-5 mb-4">
                 <h5 className="fw-bold text-center border-bottom border-light shadow-sm rounded">Book Details</h5>
-                <div className="d-flex justify-content-between align-items-center mb-2">
-                    <Button variant="warning fw-bold" onClick={handleShow}>Edit</Button>
-                    <Button variant="danger" onClick={() => handleDeleteBook(item._id)}>Delete</Button>
-                </div>
+                {
+                    user.email === null ? " " :
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                            <Button variant="warning fw-bold" onClick={handleShow}>Edit</Button>
+                            <Button variant="danger" onClick={() => handleDeleteBook(item._id)}>Delete</Button>
+                        </div>
+                }
                 <Card className="shadow-sm rounded border-0">
                     <Card.Header className="fw-bold text-dark">Author: {item?.author}</Card.Header>
                     <Card.Body>
@@ -166,7 +174,7 @@ export const SingleBook = () => {
                             </Col>
                             <Col md={6}>
                                 <div className="d-flex justify-content-end ">
-                                    <img src={item?.photo} alt="book-image" className="shadow-sm rounded" style={{ width: '200px', height: '150px', objectFit: 'cover' }} loading="lazy"/>
+                                    <img src={item?.photo} alt="book-image" className="shadow-sm rounded" style={{ width: '200px', height: '150px', objectFit: 'cover' }} loading="lazy" />
                                 </div>
                             </Col>
                         </Row>
@@ -261,18 +269,20 @@ export const SingleBook = () => {
                         }
 
                     </ListGroup>
-
-                    <div className="review-box mt-4">
-                        <h5>Add new review</h5>
-                        <Form>
-                            <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-                                <Form.Control as="textarea" rows={3} placeholder="type your comments"
-                                    onChange={(e) => setComment(e.target.value)} />
-                            </Form.Group>
-                            <Button variant="outline-success fw-bold" onClick={handleSubmit}>Add Comment</Button>
-                            <ToastContainer />
-                        </Form>
-                    </div>
+                    {
+                        user.email === null ? " " :
+                            <div className="review-box mt-4">
+                                <h5>Add new review</h5>
+                                <Form>
+                                    <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
+                                        <Form.Control as="textarea" rows={3} placeholder="type your comments"
+                                            onChange={(e) => setComment(e.target.value)} />
+                                    </Form.Group>
+                                    <Button variant="outline-success fw-bold" onClick={handleSubmit}>Add Comment</Button>
+                                    <ToastContainer />
+                                </Form>
+                            </div>
+                    }
                 </div>
             </div>
             <Footer />

@@ -1,9 +1,27 @@
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import Topbar from '../../components/Topbar';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../redux/hooks';
+import { useState } from 'react'
+import { loginUser } from '../../redux/user/userSlice';
 
 const Login = () => {
+  const dispatch = useAppDispatch()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const navigate = useNavigate()
 
+  const handleSubmit = (e: any) => {
+    e.preventDefault()
+    const options = {
+      email: email,
+      password: password,
+    }
+    console.log('options', options)
+    const res = dispatch(loginUser(options))
+    navigate('/')
+    console.log(res)
+  }
   return (
     <>
       <Topbar />
@@ -23,6 +41,7 @@ const Login = () => {
                     type="email"
                     placeholder="Enter username"
                     className='shadow-sm border-0'
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Form.Group>
                 <Form.Group controlId="formBasicPassword">
@@ -30,7 +49,12 @@ const Login = () => {
                     type="password"
                     placeholder="Password"
                     className='shadow-sm border-0 mt-3 mb-2'
+                    onChange={(e) => setPassword(e.target.value)}
                   />
+                </Form.Group>
+                <Form.Group controlId="formForgotPass">
+                  <small className='text-primary '>Didn't have an account? <Link to="/signup"> Sign up here</Link>
+                  </small>
                 </Form.Group>
                 <Form.Group controlId="formForgotPass">
                   <Link to="/forgotpassword">
@@ -38,7 +62,7 @@ const Login = () => {
                   </Link>
                 </Form.Group>
 
-                <Button variant="outline-secondary" type="submit" className='mt-3'>
+                <Button variant="outline-secondary" type="submit" className='mt-3' onClick={handleSubmit}>
                   Sign in
                 </Button>
               </Form>

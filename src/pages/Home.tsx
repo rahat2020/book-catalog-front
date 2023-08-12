@@ -5,7 +5,7 @@ import Books from '../components/Books'
 const Home = () => {
   return (
     <div>
-        <Header/>
+        {/* <Header/> */}
         <Books/>
         <Footer/>
     </div>
